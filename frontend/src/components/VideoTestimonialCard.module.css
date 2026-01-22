@@ -1,0 +1,11 @@
+/* Заокруглені кути для відео плеєра */
+.videoContainer :global(.video-js),
+.videoContainer :global(.vjs-poster),
+.videoContainer :global(video) {
+  border-radius: 1rem !important;
+  overflow: hidden;
+}
+
+.videoContainer :global(.video-js .vjs-tech) {
+  border-radius: 1rem !important;
+}

@@ -1,0 +1,148 @@
+# ProchePro - Robots.txt Professional Configuration
+# https://prochepro.fr/robots.txt
+# Updated: December 2025
+
+# ============================================
+# RÈGLES GLOBALES POUR TOUS LES BOTS
+# ============================================
+User-agent: *
+
+# Pages publiques autorisées (SEO prioritaire)
+Allow: /
+Allow: /tasks
+Allow: /tasks/browse
+Allow: /tasks/new
+Allow: /prestataires
+Allow: /services/
+Allow: /categories/
+Allow: /blog/
+Allow: /community
+Allow: /help
+Allow: /pricing
+Allow: /about
+Allow: /testimonials
+
+# Pages privées interdites
+Disallow: /dashboard
+Disallow: /profile/edit
+Disallow: /profile/settings
+Disallow: /profile/notifications
+Disallow: /messages
+Disallow: /admin
+Disallow: /auth/
+Disallow: /api/
+Disallow: /checkout
+
+# Fichiers techniques interdits
+Disallow: /_next/
+Disallow: /static/
+Disallow: /*.json$
+Disallow: /*?*api_key=
+Disallow: /*?*token=
+
+# Paramètres de recherche à ignorer (éviter duplicate content)
+Disallow: /*?page=
+Disallow: /*?sort=
+Disallow: /*?filter=
+Disallow: /*&page=
+Disallow: /*&sort=
+Disallow: /*&filter=
+# Autoriser les paramètres SEO importants
+Allow: /*?category=
+Allow: /*?city=
+
+# ============================================
+# GOOGLEBOT - PRIORITÉ MAXIMALE
+# ============================================
+User-agent: Googlebot
+Allow: /
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /admin
+Disallow: /auth/
+Disallow: /api/
+Crawl-delay: 0
+
+# Google Images
+User-agent: Googlebot-Image
+Allow: /
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.webp
+Allow: /*.svg
+
+# Google Mobile
+User-agent: Googlebot-Mobile
+Allow: /
+
+# ============================================
+# BINGBOT - MICROSOFT
+# ============================================
+User-agent: Bingbot
+Allow: /
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /admin
+Disallow: /auth/
+Disallow: /api/
+Crawl-delay: 1
+
+# ============================================
+# AUTRES MOTEURS DE RECHERCHE
+# ============================================
+
+# Yandex (Russie)
+User-agent: Yandex
+Allow: /
+Crawl-delay: 2
+
+# Baidu (Chine)
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Facebook Crawler (pour Open Graph)
+User-agent: facebookexternalhit
+Allow: /
+
+# Twitter Card Validator
+User-agent: Twitterbot
+Allow: /
+
+# LinkedIn Bot
+User-agent: LinkedInBot
+Allow: /
+
+# ============================================
+# BOTS INDÉSIRABLES - BLOQUER
+# ============================================
+
+# Scrapers agressifs
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: dotbot
+Disallow: /
+
+# ============================================
+# SITEMAPS
+# ============================================
+Sitemap: https://prochepro.fr/sitemap.xml
+
+# ============================================
+# INFORMATIONS DE CONTACT
+# ============================================
+# Contact: info@prochepro.fr
+# Site: https://prochepro.fr

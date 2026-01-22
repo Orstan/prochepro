@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1280px;
+            height: 720px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #1E88E5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 24px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .hero {
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+
+        .search {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .search input {
+            width: 300px;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .search button {
+            padding: 14px 32px;
+            background: #1E88E5;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            padding: 0 40px;
+        }
+
+        .cat {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .cat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .cat-name {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">P</div>
+            ProchePro
+        </div>
+        <div class="nav">
+            <span>Annonces</span>
+            <span>Prestataires</span>
+            <span>Tarifs</span>
+            <span>Blog</span>
+            <span>Aide</span>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <span style="padding:10px 16px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;">Se
+                connecter</span>
+            <span
+                style="padding:10px 16px;background:#1E88E5;color:white;border-radius:8px;font-size:14px;">S'inscrire</span>
+        </div>
+    </div>
+    <div class="hero">
+        <h1>Trouvez des prestataires de services près de chez vous</h1>
+        <p>Ménage, bricolage, déménagement et plus de 500 services</p>
+        <div class="search">
+            <input placeholder="Rechercher un service...">
+            <input placeholder="Paris, France">
+            <button>Rechercher</button>
+        </div>
+    </div>
+    <div class="categories">
+        <div class="cat">
+            <div class="cat-icon">🧹</div>
+            <div class="cat-name">Nettoyage</div>
+        </div>
+        <div class="cat">
+            <div class="cat-icon">🔧</div>
+            <div class="cat-name">Bricolage</div>
+        </div>
+        <div class="cat">
+            <div class="cat-icon">🚰</div>
+            <div class="cat-name">Plomberie</div>
+        </div>
+        <div class="cat">
+            <div class="cat-icon">⚡</div>
+            <div class="cat-name">Électricité</div>
+        </div>
+        <div class="cat">
+            <div class="cat-icon">🌳</div>
+            <div class="cat-name">Jardinage</div>
+        </div>
+        <div class="cat">
+            <div class="cat-icon">🚚</div>
+            <div class="cat-name">Déménagement</div>
+        </div>
+    </div>
+</body>
+
+</html>
