@@ -1,0 +1,17 @@
+[Unit]
+Description=Laravel Reverb WebSocket Server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/prochepro.fr/backend
+ExecStart=/usr/bin/php /var/www/prochepro.fr/backend/artisan reverb:start
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/www/prochepro.fr/backend/storage/logs/reverb.log
+StandardError=append:/var/www/prochepro.fr/backend/storage/logs/reverb-error.log
+
+[Install]
+WantedBy=multi-user.target
