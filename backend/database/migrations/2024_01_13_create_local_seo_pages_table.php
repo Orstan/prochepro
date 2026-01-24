@@ -31,7 +31,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Create composite index for faster lookups
-            $table->index(['district_id', 'service_category', 'service_subcategory']);
+            $table->index(['district_id', 'service_category', 'service_subcategory'], 'lsp_dist_cat_subcat_idx');
         });
     }
 

@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -173,10 +174,17 @@ class AuthController extends Controller
     {
         // Validate - either email or phone is required
         $request->validate([
-            'email' => ['required_without:phone', 'nullable', 'string', 'email'],
-            'phone' => ['required_without:email', 'nullable', 'string'],
+            'email' => ['sometimes', 'nullable', 'string', 'email'],
+            'phone' => ['sometimes', 'nullable', 'string'],
             'password' => ['required', 'string'],
         ]);
+
+        // At least one identifier is required
+        if (!$request->filled('email') && !$request->filled('phone')) {
+            return response()->json([
+                'message' => 'Email ou téléphone requis.',
+            ], 422);
+        }
 
         // Try to find user by email or phone
         $user = null;
@@ -205,7 +213,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->makeVisible(['is_admin']),
             'token' => $token,
         ]);
     }

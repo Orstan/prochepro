@@ -17,11 +17,11 @@ class Kernel extends ConsoleKernel
         // Run the Telegram bot every minute
         $schedule->command('telegram:bot')->everyMinute()->withoutOverlapping();
         
-        // Generate 25 fake tasks daily at 6am to keep site active
-        $schedule->command('tasks:generate-daily --count=25')->dailyAt('06:00');
+        // Generate 10 new demo tasks daily at 8am (winter 2026 seasonal)
+        $schedule->command('demo:generate-tasks')->dailyAt('08:00');
         
-        // Cleanup old generated tasks (>3 days) daily at 3am
-        $schedule->command('tasks:cleanup-generated --days=3')->dailyAt('03:00');
+        // Cleanup old demo tasks (>2 days, no accepted offers) daily at 4am
+        $schedule->command('demo:cleanup-tasks')->dailyAt('04:00');
     }
 
     /**
