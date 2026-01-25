@@ -29,6 +29,8 @@ export default function BlogPage() {
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [useApi, setUseApi] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ARTICLES_PER_PAGE = 9;
 
   useEffect(() => {
     async function fetchData() {
