@@ -1,7 +1,4 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Metadata } from "next";
 import Link from "next/link";
 import { sanitizeHtml } from "@/lib/sanitize";
 
@@ -18,50 +15,55 @@ interface LocalSeoPage {
   service_subcategory?: string;
 }
 
-export default function LocalSeoPage() {
-  const params = useParams();
-  const { category, district } = params;
-  const [page, setPage] = useState<LocalSeoPage | null>(null);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  params: { category: string; district: string };
+}
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(
-          `${API_BASE_URL}/api/local-pages/district/${district}/service/${category}`
-        );
-        
-        if (res.ok) {
-          const data = await res.json();
-          setPage(data.page || null);
-        }
-      } catch (error) {
-        // Error fetching local SEO page
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    fetchData();
-  }, [category, district]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="animate-pulse">
-            <div className="h-8 bg-slate-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-slate-200 rounded w-1/2 mb-8"></div>
-            <div className="space-y-3">
-              <div className="h-4 bg-slate-200 rounded"></div>
-              <div className="h-4 bg-slate-200 rounded"></div>
-              <div className="h-4 bg-slate-200 rounded w-5/6"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+async function getLocalSeoData(category: string, district: string) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/local-pages/district/${district}/service/${category}`,
+      { cache: 'no-store' }
     );
+    
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    return data.page || null;
+  } catch {
+    return null;
   }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const data = await getLocalSeoData(params.category, params.district);
+
+  if (!data) {
+    return {
+      title: "Service non trouvé | ProchePro",
+      description: "Ce service n'existe pas dans cette zone.",
+    };
+  }
+
+  return {
+    title: data.meta_title || data.title || "ProchePro",
+    description: data.meta_description || data.content?.substring(0, 160) || "",
+    keywords: data.keywords || [],
+    openGraph: {
+      title: data.meta_title || data.title || "ProchePro",
+      description: data.meta_description || data.content?.substring(0, 160) || "",
+      type: "website",
+      locale: "fr_FR",
+      siteName: "ProchePro",
+    },
+    alternates: {
+      canonical: `https://prochepro.fr/zone/${params.category}/${params.district}`,
+    },
+  };
+}
+
+export default async function LocalSeoPage({ params }: Props) {
+  const page = await getLocalSeoData(params.category, params.district);
 
   if (!page) {
     return (
@@ -96,7 +98,7 @@ export default function LocalSeoPage() {
 
           <div className="mt-12 pt-8 border-t border-slate-200">
             <Link
-              href={`/tasks/new?category=${category}`}
+              href={`/tasks/new?category=${params.category}`}
               className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-8 py-3 text-white font-semibold hover:bg-sky-600"
             >
               Publier une demande
