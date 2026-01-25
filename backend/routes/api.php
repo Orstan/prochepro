@@ -126,12 +126,12 @@ Route::get('/tasks/insurance-options', [TaskController::class, 'insuranceOptions
 Route::get('/tasks/counts-by-category', [TaskController::class, 'countsByCategory']);
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::get('/tasks/{task}', [TaskController::class, 'show']);
-Route::post('/tasks', [TaskController::class, 'store']);
-Route::put('/tasks/{task}', [TaskController::class, 'update']);
+Route::post('/tasks', [TaskController::class, 'store'])->middleware('throttle:tasks');
+Route::put('/tasks/{task}', [TaskController::class, 'update'])->middleware('throttle:tasks');
 Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 Route::post('/tasks/{task}/cancel', [TaskController::class, 'cancel']);
 Route::post('/tasks/{task}/complete', [TaskController::class, 'complete']);
-Route::post('/tasks/{task}/images', [TaskController::class, 'uploadImages']);
+Route::post('/tasks/{task}/images', [TaskController::class, 'uploadImages'])->middleware('throttle:tasks');
 Route::delete('/tasks/{task}/images', [TaskController::class, 'deleteImage']);
 Route::get('/tasks/{task}/contact', [TaskController::class, 'getContactInfo']);
 
@@ -152,7 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/tasks/{task}/tracking', [\App\Http\Controllers\Api\GeolocationController::class, 'getLocationTracking']);
 
 Route::get('/tasks/{task}/offers', [OfferController::class, 'index']);
-Route::post('/tasks/{task}/offers', [OfferController::class, 'store']);
+Route::post('/tasks/{task}/offers', [OfferController::class, 'store'])->middleware('throttle:offers');
 Route::post('/tasks/{task}/offers/{offer}/accept', [OfferController::class, 'accept']);
 Route::post('/tasks/{task}/offers/{offer}/withdraw', [OfferController::class, 'withdraw']);
 
@@ -167,18 +167,18 @@ Route::post('/direct-requests/{id}/respond', [\App\Http\Controllers\Api\DirectRe
 Route::delete('/direct-requests/{id}', [\App\Http\Controllers\Api\DirectRequestController::class, 'destroy'])->middleware('auth:sanctum');
 
 Route::get('/tasks/{task}/messages', [MessageController::class, 'index'])->middleware('cors.messages');
-Route::post('/tasks/{task}/messages', [MessageController::class, 'store'])->middleware('cors.messages');
+Route::post('/tasks/{task}/messages', [MessageController::class, 'store'])->middleware(['cors.messages', 'throttle:messages']);
 Route::post('/tasks/{task}/typing', [MessageController::class, 'typing'])->middleware('cors.messages');
 Route::post('/tasks/{task}/messages/{message}/read', [MessageController::class, 'markAsRead'])->middleware('cors.messages');
 Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount']);
 
 Route::get('/tasks/{task}/reviews', [ReviewController::class, 'showForTask']);
-Route::post('/tasks/{task}/reviews', [ReviewController::class, 'store']);
-Route::post('/tasks/{task}/reviews/from-prestataire', [ReviewController::class, 'storeFromPrestataire']);
+Route::post('/tasks/{task}/reviews', [ReviewController::class, 'store'])->middleware('throttle:reviews');
+Route::post('/tasks/{task}/reviews/from-prestataire', [ReviewController::class, 'storeFromPrestataire'])->middleware('throttle:reviews');
 Route::get('/prestataires/{prestataire}/reviews', [ReviewController::class, 'indexForPrestataire']);
 Route::get('/clients/{client}/reviews', [ReviewController::class, 'indexForClient']);
-Route::post('/reviews/upload-photo', [\App\Http\Controllers\Api\ReviewPhotoController::class, 'upload']);
-Route::delete('/reviews/delete-photo', [\App\Http\Controllers\Api\ReviewPhotoController::class, 'delete']);
+Route::post('/reviews/upload-photo', [\App\Http\Controllers\Api\ReviewPhotoController::class, 'upload'])->middleware('throttle:reviews');
+Route::delete('/reviews/delete-photo', [\App\Http\Controllers\Api\ReviewPhotoController::class, 'delete'])->middleware('throttle:reviews');
 
 Route::get('/tasks/{task}/payment', [PaymentController::class, 'showForTask']);
 Route::post('/tasks/{task}/pay', [PaymentController::class, 'payForTask']);

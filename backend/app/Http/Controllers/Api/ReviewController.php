@@ -28,9 +28,36 @@ class ReviewController extends Controller
             'photos.*' => ['nullable', 'string'],
         ]);
 
+        // FRAUD DETECTION #1: Task must be completed
         if ($task->status !== 'completed') {
             return response()->json([
                 'message' => 'La tâche doit être terminée avant de laisser un avis.',
+            ], 422);
+        }
+
+        // FRAUD DETECTION #2: Verify user is actually the client
+        if ($task->client_id !== $validated['client_id']) {
+            return response()->json([
+                'message' => 'Vous n\'êtes pas le client de cette tâche.',
+            ], 403);
+        }
+
+        // FRAUD DETECTION #3: Check for duplicate review
+        $existingReview = Review::where('task_id', $task->id)
+            ->where('client_id', $validated['client_id'])
+            ->where('direction', 'client_to_prestataire')
+            ->first();
+        
+        if ($existingReview) {
+            return response()->json([
+                'message' => 'Vous avez déjà laissé un avis pour cette tâche.',
+            ], 422);
+        }
+
+        // FRAUD DETECTION #4: Time limit - 90 days after completion
+        if ($task->updated_at && $task->updated_at->lt(now()->subDays(90))) {
+            return response()->json([
+                'message' => 'Le délai pour laisser un avis a expiré (90 jours maximum).',
             ], 422);
         }
 

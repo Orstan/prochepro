@@ -36,6 +36,23 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->ip());
         });
 
+        // Stricter limits for write operations
+        RateLimiter::for('messages', function (Request $request) {
+            return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('reviews', function (Request $request) {
+            return Limit::perHour(10)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('offers', function (Request $request) {
+            return Limit::perHour(30)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('tasks', function (Request $request) {
+            return Limit::perHour(20)->by($request->user()?->id ?: $request->ip());
+        });
+
         // Email Automation Event Listeners
         Event::listen(
             \Illuminate\Auth\Events\Registered::class,
