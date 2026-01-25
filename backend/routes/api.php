@@ -361,8 +361,8 @@ Route::middleware('auth:sanctum')->group(function () {
 // Analytics routes
 Route::post('/analytics/track-event', [AnalyticsController::class, 'trackEvent']);
 Route::post('/analytics/track-profile-view/{profileUserId}', [AnalyticsController::class, 'trackProfileView']);
-Route::get('/analytics/business', [AnalyticsController::class, 'getBusinessAnalytics'])->middleware('auth:sanctum');
-Route::get('/analytics/demand-forecast', [AnalyticsController::class, 'getDemandForecast']);
+Route::get('/analytics/business', [AnalyticsController::class, 'business'])->middleware('auth:sanctum');
+Route::get('/analytics/demand-forecast', [AnalyticsController::class, 'demandForecast'])->middleware('auth:sanctum');
 Route::get('/analytics/campaigns', [AnalyticsController::class, 'getCampaignAnalytics'])->middleware('auth:sanctum');
 Route::get('/analytics/live-stats', [AnalyticsController::class, 'liveStats'])->middleware('auth:sanctum');
 Route::get('/analytics/debug-prestataire', [AnalyticsController::class, 'debugPrestataireData'])->middleware('auth:sanctum');
