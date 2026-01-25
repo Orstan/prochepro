@@ -129,7 +129,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         if (cat.subcategories && Array.isArray(cat.subcategories)) {
           for (const sub of cat.subcategories.slice(0, 5)) {
             categoryPages.push({
-              url: `${SITE_URL}/tasks/browse?category=${cat.key}&subcategory=${sub.key}`,
+              url: `${SITE_URL}/tasks/browse?category=${cat.key}&amp;subcategory=${sub.key}`,
               lastModified: new Date(),
               changeFrequency: "daily" as const,
               priority: 0.8,
