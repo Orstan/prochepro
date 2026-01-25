@@ -103,6 +103,93 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * Get live statistics for authenticated user (real-time dashboard data)
+     */
+    public function liveStats(Request $request): JsonResponse
+    {
+        $userId = auth()->id();
+        
+        if (!$userId) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        try {
+            $user = \App\Models\User::findOrFail($userId);
+            
+            // Get task IDs where user is involved
+            $clientTaskIds = \App\Models\Task::where('client_id', $userId)->pluck('id')->toArray();
+            $prestataireTaskIds = \App\Models\Offer::where('prestataire_id', $userId)
+                ->where('status', 'accepted')
+                ->pluck('task_id')
+                ->toArray();
+            $allUserTaskIds = array_unique(array_merge($clientTaskIds, $prestataireTaskIds));
+            
+            // Count unread messages
+            $unreadMessages = !empty($allUserTaskIds) 
+                ? \App\Models\Message::whereIn('task_id', $allUserTaskIds)
+                    ->where('sender_id', '!=', $userId)
+                    ->whereNull('read_at')
+                    ->count()
+                : 0;
+            
+            // Statistics
+            $stats = [
+                // Online status (approximate)
+                'online_users' => \Illuminate\Support\Facades\Cache::get('online_users_count', 0),
+                
+                // Active tasks on platform
+                'active_tasks_total' => \App\Models\Task::where('status', 'open')->count(),
+                
+                // My tasks (as client)
+                'my_tasks' => [
+                    'open' => \App\Models\Task::where('client_id', $userId)->where('status', 'open')->count(),
+                    'in_progress' => \App\Models\Task::where('client_id', $userId)->where('status', 'in_progress')->count(),
+                    'completed' => \App\Models\Task::where('client_id', $userId)->where('status', 'completed')->count(),
+                ],
+                
+                // My offers (as prestataire)
+                'my_offers' => [
+                    'pending' => \App\Models\Offer::where('prestataire_id', $userId)->where('status', 'pending')->count(),
+                    'accepted' => \App\Models\Offer::where('prestataire_id', $userId)->where('status', 'accepted')->count(),
+                    'rejected' => \App\Models\Offer::where('prestataire_id', $userId)->where('status', 'rejected')->count(),
+                ],
+                
+                // Messages & Notifications
+                'unread_messages' => $unreadMessages,
+                'unread_notifications' => \App\Models\Notification::where('user_id', $userId)
+                    ->whereNull('read_at')
+                    ->count(),
+                
+                // Today's activity
+                'today' => [
+                    'profile_views' => \App\Models\ProfileView::where('profile_user_id', $userId)
+                        ->whereDate('created_at', today())
+                        ->count(),
+                    'new_offers' => \App\Models\Offer::where('prestataire_id', $userId)
+                        ->whereDate('created_at', today())
+                        ->count(),
+                    'revenue' => \App\Models\Payment::where('prestataire_id', $userId)
+                        ->where('status', 'completed')
+                        ->whereDate('created_at', today())
+                        ->sum('provider_amount') ?? 0,
+                ],
+            ];
+            
+            return response()->json($stats);
+        } catch (\Exception $e) {
+            \Log::error('Error getting live stats', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+            
+            return response()->json([
+                'error' => 'Failed to fetch statistics',
+                'message' => config('app.debug') ? $e->getMessage() : 'Please try again later'
+            ], 500);
+        }
+    }
+
+    /**
      * Debug endpoint to check prestataire data in database
      */
     public function debugPrestataireData(Request $request): JsonResponse

@@ -212,10 +212,6 @@ class MessageController extends Controller
             
             // Tasks where user is client
             $clientTaskIds = Task::where('client_id', $userId)
-                ->where(function ($q) {
-                    $q->where('status', 'in_progress')
-                      ->orWhere('status', 'completed');
-                })
                 ->pluck('id')
                 ->toArray();
             
@@ -225,34 +221,44 @@ class MessageController extends Controller
                 ->pluck('task_id')
                 ->toArray();
             
-            $taskIds = array_merge($clientTaskIds, $prestataireTaskIds);
+            $taskIds = array_unique(array_merge($clientTaskIds, $prestataireTaskIds));
             
             if (empty($taskIds)) {
-                return response()->json(['unread_count' => 0]);
+                return response()->json([
+                    'unread_count' => 0,
+                    'as_client' => 0,
+                    'as_prestataire' => 0,
+                ]);
             }
 
-            // Count unread messages in these tasks where user is NOT the sender
-            $unreadCount = Message::whereIn('task_id', $taskIds)
+            // Count unread messages - use read_at as primary indicator
+            $unreadAsClient = Message::whereIn('task_id', $clientTaskIds)
                 ->where('sender_id', '!=', $userId)
-                ->where(function ($query) {
-                    $query->where('is_read', false)
-                          ->orWhereNull('is_read');
-                })
+                ->whereNull('read_at')
                 ->count();
+            
+            $unreadAsPrestataire = Message::whereIn('task_id', $prestataireTaskIds)
+                ->where('sender_id', '!=', $userId)
+                ->whereNull('read_at')
+                ->count();
+            
+            $totalUnread = $unreadAsClient + $unreadAsPrestataire;
 
-            \Log::info('Unread messages count', [
-                'user_id' => $userId,
-                'task_ids' => $taskIds,
-                'unread_count' => $unreadCount
+            return response()->json([
+                'unread_count' => $totalUnread,
+                'as_client' => $unreadAsClient,
+                'as_prestataire' => $unreadAsPrestataire,
             ]);
-
-            return response()->json(['unread_count' => $unreadCount]);
         } catch (\Exception $e) {
             \Log::error('Error counting unread messages', [
                 'user_id' => $userId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-            return response()->json(['error' => 'Internal error'], 500);
+            return response()->json([
+                'error' => 'Internal server error',
+                'message' => config('app.debug') ? $e->getMessage() : 'Please try again later'
+            ], 500);
         }
     }
 }

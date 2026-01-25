@@ -362,6 +362,7 @@ Route::post('/analytics/track-profile-view/{profileUserId}', [AnalyticsControlle
 Route::get('/analytics/business', [AnalyticsController::class, 'getBusinessAnalytics'])->middleware('auth:sanctum');
 Route::get('/analytics/demand-forecast', [AnalyticsController::class, 'getDemandForecast']);
 Route::get('/analytics/campaigns', [AnalyticsController::class, 'getCampaignAnalytics'])->middleware('auth:sanctum');
+Route::get('/analytics/live-stats', [AnalyticsController::class, 'liveStats'])->middleware('auth:sanctum');
 Route::get('/analytics/debug-prestataire', [AnalyticsController::class, 'debugPrestataireData'])->middleware('auth:sanctum');
 
 // Provider Insights routes
