@@ -83,7 +83,19 @@ export default function BlogPage() {
     : BLOG_CATEGORIES;
 
   const featuredArticle = sortedArticles[0];
-  const otherArticles = sortedArticles.slice(1);
+  const allOtherArticles = sortedArticles.slice(1);
+  
+  // Pagination logic
+  const totalPages = Math.ceil(allOtherArticles.length / ARTICLES_PER_PAGE);
+  const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
+  const endIndex = startIndex + ARTICLES_PER_PAGE;
+  const otherArticles = allOtherArticles.slice(startIndex, endIndex);
+  
+  // Scroll to top when page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
 
   if (loading) {
     return (
