@@ -7,8 +7,9 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const service = getServiceBySlug(params.service);
-  const cityName = decodeURIComponent(params.city).replace(/-/g, " ");
+  const resolvedParams = await params;
+  const service = getServiceBySlug(resolvedParams.service);
+  const cityName = decodeURIComponent(resolvedParams.city).replace(/-/g, " ");
   const cityInfo = CITIES_WITH_REGIONS.find(
     c => c.city.toLowerCase() === cityName.toLowerCase()
   );
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       locale: "fr_FR",
       siteName: "ProchePro",
-      url: `https://prochepro.fr/services/${params.service}/${params.city}`,
+      url: `https://prochepro.fr/services/${resolvedParams.service}/${resolvedParams.city}`,
     },
     twitter: {
       card: "summary_large_image",
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
     },
     alternates: {
-      canonical: `https://prochepro.fr/services/${params.service}/${params.city}`,
+      canonical: `https://prochepro.fr/services/${resolvedParams.service}/${resolvedParams.city}`,
     },
     robots: {
       index: true,
