@@ -234,4 +234,51 @@ class ReviewController extends Controller
 
         return response()->json($reviews);
     }
+
+    /**
+     * Provider responds to a review
+     */
+    public function respondToReview(Request $request, Review $review): JsonResponse
+    {
+        $validated = $request->validate([
+            'prestataire_id' => ['required', 'integer', 'exists:users,id'],
+            'response' => ['required', 'string', 'max:1000'],
+        ]);
+
+        // Verify the prestataire is the one who received the review
+        if ($review->prestataire_id !== $validated['prestataire_id']) {
+            return response()->json([
+                'message' => 'Vous ne pouvez pas répondre à cet avis.',
+            ], 403);
+        }
+
+        // Check if already responded
+        if ($review->provider_response) {
+            return response()->json([
+                'message' => 'Vous avez déjà répondu à cet avis.',
+            ], 422);
+        }
+
+        // Update review with response
+        $review->update([
+            'provider_response' => $validated['response'],
+            'response_at' => now(),
+        ]);
+
+        // Notify client about the response
+        Notification::create([
+            'user_id' => $review->client_id,
+            'type' => 'review_response',
+            'data' => [
+                'review_id' => $review->id,
+                'task_id' => $review->task_id,
+                'prestataire_name' => User::find($validated['prestataire_id'])->name,
+            ],
+        ]);
+
+        return response()->json([
+            'message' => 'Réponse ajoutée avec succès',
+            'review' => $review->fresh(),
+        ]);
+    }
 }

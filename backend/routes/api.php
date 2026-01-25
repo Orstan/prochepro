@@ -175,6 +175,7 @@ Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount'
 Route::get('/tasks/{task}/reviews', [ReviewController::class, 'showForTask']);
 Route::post('/tasks/{task}/reviews', [ReviewController::class, 'store'])->middleware('throttle:reviews');
 Route::post('/tasks/{task}/reviews/from-prestataire', [ReviewController::class, 'storeFromPrestataire'])->middleware('throttle:reviews');
+Route::post('/reviews/{review}/respond', [ReviewController::class, 'respondToReview'])->middleware('throttle:reviews');
 Route::get('/prestataires/{prestataire}/reviews', [ReviewController::class, 'indexForPrestataire']);
 Route::get('/clients/{client}/reviews', [ReviewController::class, 'indexForClient']);
 Route::post('/reviews/upload-photo', [\App\Http\Controllers\Api\ReviewPhotoController::class, 'upload'])->middleware('throttle:reviews');

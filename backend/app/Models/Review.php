@@ -23,6 +23,8 @@ class Review extends Model
         'comment',
         'photos',
         'direction',
+        'provider_response',
+        'response_at',
     ];
     
     /**
