@@ -83,10 +83,8 @@ class SetupTelegramBot extends Command
     {
         $webhookUrl = config('app.url') . '/api/telegram/webhook';
         
-        // Replace localhost with actual domain if needed
-        if (str_contains($webhookUrl, 'localhost')) {
-            $webhookUrl = 'https://api.prochepro.fr/api/telegram/webhook';
-        }
+        // Always use API domain for webhook
+        $webhookUrl = 'https://api.prochepro.fr/api/telegram/webhook';
         
         try {
             $response = Http::post("https://api.telegram.org/bot{$botToken}/setWebhook", [
