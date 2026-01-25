@@ -51,20 +51,14 @@ class GenerateSitemap extends Command
         $prestatairesCount = 0;
         User::where('is_verified', true)
             ->where('is_blocked', false)
-            ->where(function($query) {
-                $query->whereJsonContains('roles', 'prestataire')
-                      ->orWhere('role', 'prestataire');
-            })
+            ->whereJsonContains('roles', 'prestataire')
+            ->orWhere('role', 'prestataire')
             ->each(function (User $user) use ($sitemap, $baseUrl, &$prestatairesCount) {
-                try {
-                    $sitemap->add(Url::create("{$baseUrl}/prestataires/{$user->id}")
-                        ->setLastModificationDate($user->updated_at)
-                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                        ->setPriority(0.6));
-                    $prestatairesCount++;
-                } catch (\Exception $e) {
-                    $this->warn("⚠️ Пропущено профіль {$user->id}: " . $e->getMessage());
-                }
+                $sitemap->add(Url::create("{$baseUrl}/prestataires/{$user->id}")
+                    ->setLastModificationDate($user->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                    ->setPriority(0.6));
+                $prestatairesCount++;
             });
 
         $this->info("✅ Додано {$prestatairesCount} профілів виконавців");
@@ -88,15 +82,11 @@ class GenerateSitemap extends Command
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
             ->each(function (BlogPost $post) use ($sitemap, $baseUrl, &$blogCount) {
-                try {
-                    $sitemap->add(Url::create("{$baseUrl}/blog/{$post->slug}")
-                        ->setLastModificationDate($post->updated_at)
-                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-                        ->setPriority(0.6));
-                    $blogCount++;
-                } catch (\Exception $e) {
-                    $this->warn("⚠️ Пропущено пост {$post->slug}: " . $e->getMessage());
-                }
+                $sitemap->add(Url::create("{$baseUrl}/blog/{$post->slug}")
+                    ->setLastModificationDate($post->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                    ->setPriority(0.6));
+                $blogCount++;
             });
 
         $this->info("✅ Додано {$blogCount} статей блогу");
@@ -104,15 +94,11 @@ class GenerateSitemap extends Command
         $blogCategoriesCount = 0;
         \App\Models\BlogCategory::orderBy('sort_order')
             ->each(function ($category) use ($sitemap, $baseUrl, &$blogCategoriesCount) {
-                try {
-                    $sitemap->add(Url::create("{$baseUrl}/blog/categorie/{$category->slug}")
-                        ->setLastModificationDate($category->updated_at)
-                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                        ->setPriority(0.7));
-                    $blogCategoriesCount++;
-                } catch (\Exception $e) {
-                    $this->warn("⚠️ Пропущено категорію {$category->slug}: " . $e->getMessage());
-                }
+                $sitemap->add(Url::create("{$baseUrl}/blog/categorie/{$category->slug}")
+                    ->setLastModificationDate($category->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                    ->setPriority(0.7));
+                $blogCategoriesCount++;
             });
 
         $this->info("✅ Додано {$blogCategoriesCount} категорій блогу");
@@ -123,15 +109,11 @@ class GenerateSitemap extends Command
             ->each(function ($page) use ($sitemap, $baseUrl, &$localSeoCount) {
                 $district = \App\Models\CityDistrict::find($page->district_id);
                 if ($district) {
-                    try {
-                        $sitemap->add(Url::create("{$baseUrl}/zone/{$page->service_category}/{$district->slug}")
-                            ->setLastModificationDate($page->updated_at)
-                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                            ->setPriority(0.8));
-                        $localSeoCount++;
-                    } catch (\Exception $e) {
-                        $this->warn("⚠️ Пропущено LocalSeo {$page->service_category}/{$district->slug}: " . $e->getMessage());
-                    }
+                    $sitemap->add(Url::create("{$baseUrl}/zone/{$page->service_category}/{$district->slug}")
+                        ->setLastModificationDate($page->updated_at)
+                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                        ->setPriority(0.8));
+                    $localSeoCount++;
                 }
             });
 

@@ -234,13 +234,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Blog article pages
+  // Blog article pages (main articles)
   const blogArticlePages: MetadataRoute.Sitemap = BLOG_ARTICLES.map((article) => ({
     url: `${SITE_URL}/blog/${article.slug}`,
     lastModified: new Date(article.updatedAt),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
+  
+  // 🚀 MASSIVE SEO: Blog articles × Paris locations (20 districts + 35+ suburbs)
+  // This generates THOUSANDS of unique localized pages
+  const blogLocalizedPages: MetadataRoute.Sitemap = [];
+  
+  // Import Paris locations
+  const { PARIS_DISTRICTS, PARIS_SUBURBS } = await import("@/lib/paris-districts");
+  const allLocations = [...PARIS_DISTRICTS, ...PARIS_SUBURBS];
+  
+  for (const article of BLOG_ARTICLES) {
+    for (const location of allLocations) {
+      blogLocalizedPages.push({
+        url: `${SITE_URL}/blog/${article.slug}/${location.code.toLowerCase()}`,
+        lastModified: new Date(article.updatedAt),
+        changeFrequency: "monthly" as const,
+        priority: 0.75,
+      });
+    }
+  }
+  
+  console.log(`✨ Generated ${blogLocalizedPages.length} localized blog pages!`);
 
   // Forum pages
   let forumPages: MetadataRoute.Sitemap = [{
@@ -297,6 +318,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogMainPage,
     ...blogCategoryPages,
     ...blogArticlePages,
+    ...blogLocalizedPages, // 🚀 THOUSANDS of localized blog pages
     ...forumPages,
     ...prestatairesPages,
   ];

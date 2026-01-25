@@ -30,7 +30,11 @@ export type ParisZone =
 export type SuburbZone = 
   | "hauts_de_seine"      // 92
   | "seine_saint_denis"   // 93
-  | "val_de_marne";       // 94
+  | "val_de_marne"        // 94
+  | "seine_et_marne"      // 77
+  | "yvelines"            // 78
+  | "essonne"             // 91
+  | "val_doise";          // 95
 
 export const PARIS_ZONES: { key: ParisZone; label: string; icon: string }[] = [
   { key: "centre", label: "Paris Centre", icon: "🏛️" },
@@ -44,6 +48,10 @@ export const SUBURB_ZONES: { key: SuburbZone; label: string; department: string 
   { key: "hauts_de_seine", label: "Hauts-de-Seine", department: "92" },
   { key: "seine_saint_denis", label: "Seine-Saint-Denis", department: "93" },
   { key: "val_de_marne", label: "Val-de-Marne", department: "94" },
+  { key: "seine_et_marne", label: "Seine-et-Marne", department: "77" },
+  { key: "yvelines", label: "Yvelines", department: "78" },
+  { key: "essonne", label: "Essonne", department: "91" },
+  { key: "val_doise", label: "Val-d'Oise", department: "95" },
 ];
 
 export const PARIS_DISTRICTS: District[] = [
@@ -260,6 +268,74 @@ export const PARIS_SUBURBS: Suburb[] = [
   { code: "94400", name: "Vitry-sur-Seine", department: "94", postalCode: "94400", zone: "val_de_marne" },
   { code: "94700", name: "Maisons-Alfort", department: "94", postalCode: "94700", zone: "val_de_marne" },
   { code: "94500", name: "Champigny-sur-Marne", department: "94", postalCode: "94500", zone: "val_de_marne" },
+  
+  // Seine-et-Marne (77) - Major cities
+  { code: "77000", name: "Melun", department: "77", postalCode: "77000", zone: "seine_et_marne" },
+  { code: "77100", name: "Meaux", department: "77", postalCode: "77100", zone: "seine_et_marne" },
+  { code: "77400", name: "Lagny-sur-Marne", department: "77", postalCode: "77400", zone: "seine_et_marne" },
+  { code: "77500", name: "Chelles", department: "77", postalCode: "77500", zone: "seine_et_marne" },
+  { code: "77600", name: "Bussy-Saint-Georges", department: "77", postalCode: "77600", zone: "seine_et_marne" },
+  { code: "77700", name: "Serris", department: "77", postalCode: "77700", zone: "seine_et_marne" },
+  { code: "77200", name: "Torcy", department: "77", postalCode: "77200", zone: "seine_et_marne" },
+  { code: "77300", name: "Fontainebleau", department: "77", postalCode: "77300", zone: "seine_et_marne" },
+  { code: "77380", name: "Combs-la-Ville", department: "77", postalCode: "77380", zone: "seine_et_marne" },
+  { code: "77330", name: "Ozoir-la-Ferrière", department: "77", postalCode: "77330", zone: "seine_et_marne" },
+  { code: "77340", name: "Pontault-Combault", department: "77", postalCode: "77340", zone: "seine_et_marne" },
+  { code: "77176", name: "Savigny-le-Temple", department: "77", postalCode: "77176", zone: "seine_et_marne" },
+  { code: "77186", name: "Noisiel", department: "77", postalCode: "77186", zone: "seine_et_marne" },
+  { code: "77190", name: "Dammarie-les-Lys", department: "77", postalCode: "77190", zone: "seine_et_marne" },
+  { code: "77140", name: "Nemours", department: "77", postalCode: "77140", zone: "seine_et_marne" },
+  
+  // Yvelines (78) - Major cities
+  { code: "78000", name: "Versailles", department: "78", postalCode: "78000", zone: "yvelines" },
+  { code: "78100", name: "Saint-Germain-en-Laye", department: "78", postalCode: "78100", zone: "yvelines" },
+  { code: "78200", name: "Mantes-la-Jolie", department: "78", postalCode: "78200", zone: "yvelines" },
+  { code: "78300", name: "Poissy", department: "78", postalCode: "78300", zone: "yvelines" },
+  { code: "78500", name: "Sartrouville", department: "78", postalCode: "78500", zone: "yvelines" },
+  { code: "78130", name: "Les Mureaux", department: "78", postalCode: "78130", zone: "yvelines" },
+  { code: "78150", name: "Le Chesnay-Rocquencourt", department: "78", postalCode: "78150", zone: "yvelines" },
+  { code: "78180", name: "Montigny-le-Bretonneux", department: "78", postalCode: "78180", zone: "yvelines" },
+  { code: "78190", name: "Trappes", department: "78", postalCode: "78190", zone: "yvelines" },
+  { code: "78400", name: "Chatou", department: "78", postalCode: "78400", zone: "yvelines" },
+  { code: "78230", name: "Le Pecq", department: "78", postalCode: "78230", zone: "yvelines" },
+  { code: "78600", name: "Maisons-Laffitte", department: "78", postalCode: "78600", zone: "yvelines" },
+  { code: "78700", name: "Conflans-Sainte-Honorine", department: "78", postalCode: "78700", zone: "yvelines" },
+  { code: "78800", name: "Houilles", department: "78", postalCode: "78800", zone: "yvelines" },
+  { code: "78140", name: "Vélizy-Villacoublay", department: "78", postalCode: "78140", zone: "yvelines" },
+  
+  // Essonne (91) - Major cities
+  { code: "91000", name: "Évry-Courcouronnes", department: "91", postalCode: "91000", zone: "essonne" },
+  { code: "91100", name: "Corbeil-Essonnes", department: "91", postalCode: "91100", zone: "essonne" },
+  { code: "91200", name: "Athis-Mons", department: "91", postalCode: "91200", zone: "essonne" },
+  { code: "91300", name: "Massy", department: "91", postalCode: "91300", zone: "essonne" },
+  { code: "91400", name: "Orsay", department: "91", postalCode: "91400", zone: "essonne" },
+  { code: "91120", name: "Palaiseau", department: "91", postalCode: "91120", zone: "essonne" },
+  { code: "91150", name: "Étampes", department: "91", postalCode: "91150", zone: "essonne" },
+  { code: "91160", name: "Longjumeau", department: "91", postalCode: "91160", zone: "essonne" },
+  { code: "91170", name: "Viry-Châtillon", department: "91", postalCode: "91170", zone: "essonne" },
+  { code: "91240", name: "Saint-Michel-sur-Orge", department: "91", postalCode: "91240", zone: "essonne" },
+  { code: "91260", name: "Juvisy-sur-Orge", department: "91", postalCode: "91260", zone: "essonne" },
+  { code: "91270", name: "Vigneux-sur-Seine", department: "91", postalCode: "91270", zone: "essonne" },
+  { code: "91350", name: "Grigny", department: "91", postalCode: "91350", zone: "essonne" },
+  { code: "91700", name: "Sainte-Geneviève-des-Bois", department: "91", postalCode: "91700", zone: "essonne" },
+  { code: "91380", name: "Chilly-Mazarin", department: "91", postalCode: "91380", zone: "essonne" },
+  
+  // Val-d'Oise (95) - Major cities
+  { code: "95000", name: "Cergy", department: "95", postalCode: "95000", zone: "val_doise" },
+  { code: "95100", name: "Argenteuil", department: "95", postalCode: "95100", zone: "val_doise" },
+  { code: "95200", name: "Sarcelles", department: "95", postalCode: "95200", zone: "val_doise" },
+  { code: "95500", name: "Gonesse", department: "95", postalCode: "95500", zone: "val_doise" },
+  { code: "95600", name: "Eaubonne", department: "95", postalCode: "95600", zone: "val_doise" },
+  { code: "95110", name: "Sannois", department: "95", postalCode: "95110", zone: "val_doise" },
+  { code: "95120", name: "Ermont", department: "95", postalCode: "95120", zone: "val_doise" },
+  { code: "95130", name: "Franconville", department: "95", postalCode: "95130", zone: "val_doise" },
+  { code: "95150", name: "Taverny", department: "95", postalCode: "95150", zone: "val_doise" },
+  { code: "95190", name: "Goussainville", department: "95", postalCode: "95190", zone: "val_doise" },
+  { code: "95210", name: "Saint-Gratien", department: "95", postalCode: "95210", zone: "val_doise" },
+  { code: "95220", name: "Herblay-sur-Seine", department: "95", postalCode: "95220", zone: "val_doise" },
+  { code: "95230", name: "Soisy-sous-Montmorency", department: "95", postalCode: "95230", zone: "val_doise" },
+  { code: "95240", name: "Cormeilles-en-Parisis", department: "95", postalCode: "95240", zone: "val_doise" },
+  { code: "95250", name: "Beauchamp", department: "95", postalCode: "95250", zone: "val_doise" },
 ];
 
 // Helper functions
