@@ -290,6 +290,17 @@ export default function RootLayout({
                     // Register Service Worker
                     const registration = await navigator.serviceWorker.register('/sw.js');
                     
+                    // Wait for Service Worker to become active
+                    if (registration.installing) {
+                      await new Promise(resolve => {
+                        registration.installing.addEventListener('statechange', function() {
+                          if (this.state === 'activated') resolve();
+                        });
+                      });
+                    } else if (!registration.active) {
+                      await navigator.serviceWorker.ready;
+                    }
+                    
                     // Global function to register push notifications
                     window.registerPushNotifications = async function() {
                       try {
