@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import UserAvatar from "@/components/UserAvatar";
 import { API_BASE_URL } from "@/lib/api";
-import AnalyticsDashboardFr from "@/components/analytics/AnalyticsDashboardFr";
-import AnalyticsAccessGuard from "@/components/analytics/AnalyticsAccessGuard";
 import ProviderInsightsDashboard from "@/components/dashboard/ProviderInsightsDashboard";
 
 type User = {
@@ -73,7 +71,7 @@ export default function DashboardPage() {
   const [roleSwitching, setRoleSwitching] = useState(false);
 
   // Dashboard view toggle
-  const [dashboardView, setDashboardView] = useState<'actions' | 'analytics' | 'insights'>('actions');
+  const [dashboardView, setDashboardView] = useState<'actions' | 'insights'>('actions');
 
   useEffect(() => {
     async function init() {
@@ -387,21 +385,6 @@ export default function DashboardPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Actions rapides
-                </span>
-              </button>
-              <button
-                onClick={() => setDashboardView('analytics')}
-                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex-1 sm:flex-none ${
-                  dashboardView === 'analytics'
-                    ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  Analytique
                 </span>
               </button>
               <button
@@ -918,10 +901,6 @@ export default function DashboardPage() {
               </div>
             )}
             </>
-          ) : dashboardView === 'analytics' ? (
-            <AnalyticsAccessGuard>
-              <AnalyticsDashboardFr />
-            </AnalyticsAccessGuard>
           ) : dashboardView === 'insights' ? (
             <ProviderInsightsDashboard />
           ) : null}
