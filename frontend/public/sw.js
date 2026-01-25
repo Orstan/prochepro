@@ -10,12 +10,23 @@ const STATIC_ASSETS = [
   '/icons/icon-512x512.png',
 ];
 
-// Install event - cache static assets
+// Install event - cache static assets with error handling
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
       console.log('Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
+      // Cache each asset individually to prevent one failure from breaking all
+      return Promise.allSettled(
+        STATIC_ASSETS.map((url) =>
+          cache.add(url).catch((error) => {
+            console.warn(`Failed to cache ${url}:`, error.message);
+            return null; // Continue even if one fails
+          })
+        )
+      );
+    }).catch((error) => {
+      console.error('Cache installation failed:', error);
+      // Don't fail the installation, just log the error
     })
   );
   self.skipWaiting();
