@@ -166,18 +166,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // SEO сторінки: послуга + місто (для локального SEO)
-  // Це генерує сотні сторінок типу /services/plombier/paris, /services/electricien/versailles
+  // SEO сторінки: послуга + місто (тільки топ міста, щоб уникнути XML помилок)
+  // Обмежуємо до MAIN_CITIES замість ALL_CITIES для уникнення XML помилок зі спецсимволами
   const localSeoPages: MetadataRoute.Sitemap = [];
   for (const service of SERVICES_SEO) {
-    for (const city of ALL_CITIES) {
-      const citySlug = city.toLowerCase().replace(/ /g, "-");
-      localSeoPages.push({
-        url: `${SITE_URL}/services/${service.slug}/${encodeURIComponent(citySlug)}`,
-        lastModified: new Date(),
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      });
+    for (const city of MAIN_CITIES) {
+      try {
+        // Використовуємо city.slug замість кастомного slugify для уникнення спецсимволів
+        localSeoPages.push({
+          url: `${SITE_URL}/services/${service.slug}/${city.slug}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        });
+      } catch (error) {
+        console.error(`Error adding SEO page for ${service.slug}/${city.slug}:`, error);
+      }
     }
   }
 
