@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\EmailAutomationController;
 use App\Http\Controllers\Api\SupportChatController;
 use App\Http\Controllers\Api\AdminChatController;
 use App\Http\Controllers\Api\TaxReportController;
+use App\Http\Controllers\Api\TelegramController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -229,7 +230,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Telegram Webhook (no auth - Telegram API will call this)
-Route::post('/telegram/webhook', [\App\Http\Controllers\Api\TelegramWebhookController::class, 'handle']);
+Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);
 
 // Push notifications
 Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'getVapidKey']);
