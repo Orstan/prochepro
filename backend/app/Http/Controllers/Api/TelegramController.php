@@ -23,7 +23,7 @@ class TelegramController extends Controller
         try {
             $update = $request->all();
             
-            Log::info('Telegram webhook received', ['update' => $update]);
+            Log::info('📱 [Telegram] Webhook received', ['update' => $update]);
             
             if (!isset($update['message'])) {
                 return response()->json(['ok' => true]);
@@ -50,7 +50,10 @@ class TelegramController extends Controller
             
             // Handle commands
             if (str_starts_with($text, '/')) {
+                Log::info('📱 [Telegram] Processing command', ['chat_id' => $chatId, 'command' => $text, 'user_id' => $user->id]);
                 $this->handleCommand($chatId, $text, $user);
+            } else {
+                Log::info('📱 [Telegram] Non-command message', ['chat_id' => $chatId, 'text' => $text]);
             }
             
             return response()->json(['ok' => true]);
@@ -84,14 +87,173 @@ class TelegramController extends Controller
             case '/help':
                 $this->commandHelp($chatId);
                 break;
+            case '/balance':
+                $this->commandBalance($chatId, $user);
+                break;
+            case '/messages':
+                $this->commandMessages($chatId, $user);
+                break;
+            case '/offers':
+                $this->commandOffers($chatId, $user);
+                break;
+            case '/settings':
+                $this->commandSettings($chatId, $user);
+                break;
             default:
+                Log::info('📱 [Telegram] Unknown command', ['command' => $cmd]);
                 $this->sendMessage($chatId, "❓ Commande inconnue. Tapez /help pour voir les commandes disponibles.");
         }
+        
+        Log::info('📱 [Telegram] Command handled', ['command' => $cmd, 'user_id' => $user->id]);
     }
     
     /**
      * /start command
      */
+    protected function commandBalance(string $chatId, User $user): void
+    {
+        $credits = $user->credits ?? 0;
+        $creditsUsed = Payment::where('client_id', $user->id)->where('status', 'completed')->count();
+        $creditsRemaining = max(0, 3 - $creditsUsed); // First 3 orders are 0% commission
+        
+        $message = "💰 <b>Votre Solde</b>\n\n";
+        $message .= "💳 <b>Crédits:</b> {$credits}€\n\n";
+        $message .= "🎁 <b>Offre de lancement:</b>\n";
+        $message .= "  • Commissions à 0% pour les {$creditsRemaining} premières missions\n";
+        $message .= "  • Missions complétées: {$creditsUsed}/3\n\n";
+        
+        if ($creditsRemaining > 0) {
+            $message .= "✨ Profitez de vos {$creditsRemaining} missions gratuites restantes!\n\n";
+        } else {
+            $message .= "ℹ️ Commission standard: 10% par mission\n\n";
+        }
+        
+        $message .= "🔗 <a href='https://prochepro.fr/pricing'>En savoir plus</a>";
+        
+        $this->sendMessage($chatId, $message, ['parse_mode' => 'HTML']);
+        Log::info('📱 [Telegram] /balance command executed', ['user_id' => $user->id]);
+    }
+    
+    protected function commandMessages(string $chatId, User $user): void
+    {
+        $unreadCount = $this->getUnreadMessagesCount($user->id);
+        
+        // Get recent messages
+        $recentMessages = Message::where(function($query) use ($user) {
+            $query->whereHas('task', function($q) use ($user) {
+                $q->where('client_id', $user->id);
+            })->orWhereHas('task.offers', function($q) use ($user) {
+                $q->where('prestataire_id', $user->id)->where('status', 'accepted');
+            });
+        })->where('sender_id', '!=', $user->id)
+          ->orderBy('created_at', 'desc')
+          ->limit(5)
+          ->get();
+        
+        $message = "✉️ <b>Vos Messages</b>\n\n";
+        $message .= "📬 <b>Non lus:</b> {$unreadCount}\n\n";
+        
+        if ($recentMessages->isNotEmpty()) {
+            $message .= "<b>Messages récents:</b>\n\n";
+            
+            foreach ($recentMessages as $msg) {
+                $sender = User::find($msg->sender_id);
+                $taskTitle = $msg->task ? $msg->task->title : 'Tâche';
+                $isUnread = is_null($msg->read_at) ? '🔵 ' : '';
+                
+                $senderName = $sender ? $sender->name : 'Utilisateur';
+                $message .= "{$isUnread}<b>{$senderName}</b>\n";
+                $message .= "   {$taskTitle}\n";
+                $message .= "   " . substr($msg->content, 0, 50) . (strlen($msg->content) > 50 ? '...' : '') . "\n\n";
+            }
+        } else {
+            $message .= "Aucun message récent.\n\n";
+        }
+        
+        $message .= "🔗 <a href='https://prochepro.fr/messages'>Voir tous les messages</a>";
+        
+        $this->sendMessage($chatId, $message, ['parse_mode' => 'HTML']);
+        Log::info('📱 [Telegram] /messages command executed', ['user_id' => $user->id, 'unread' => $unreadCount]);
+    }
+    
+    protected function commandOffers(string $chatId, User $user): void
+    {
+        $pendingOffers = Offer::where('prestataire_id', $user->id)
+            ->where('status', 'pending')
+            ->with('task')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+        
+        $acceptedOffers = Offer::where('prestataire_id', $user->id)
+            ->where('status', 'accepted')
+            ->with('task')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+        
+        $message = "💼 <b>Vos Offres</b>\n\n";
+        
+        if ($pendingOffers->isNotEmpty()) {
+            $message .= "⏳ <b>En attente ({$pendingOffers->count()}):</b>\n\n";
+            
+            foreach ($pendingOffers as $offer) {
+                $message .= "🔵 <b>{$offer->task->title}</b>\n";
+                $message .= "   Prix: {$offer->price}€\n";
+                $message .= "   🔗 <a href='https://prochepro.fr/tasks/{$offer->task_id}'>Voir</a>\n\n";
+            }
+        }
+        
+        if ($acceptedOffers->isNotEmpty()) {
+            $message .= "✅ <b>Acceptées ({$acceptedOffers->count()}):</b>\n\n";
+            
+            foreach ($acceptedOffers as $offer) {
+                $message .= "🟢 <b>{$offer->task->title}</b>\n";
+                $message .= "   Prix: {$offer->price}€\n";
+                $message .= "   Status: {$offer->task->status}\n";
+                $message .= "   🔗 <a href='https://prochepro.fr/tasks/{$offer->task_id}'>Voir</a>\n\n";
+            }
+        }
+        
+        if ($pendingOffers->isEmpty() && $acceptedOffers->isEmpty()) {
+            $message .= "Aucune offre active.\n\n";
+            $message .= "🔗 <a href='https://prochepro.fr/tasks/browse'>Parcourir les missions</a>";
+        } else {
+            $message .= "🔗 <a href='https://prochepro.fr/offers/mine'>Voir toutes les offres</a>";
+        }
+        
+        $this->sendMessage($chatId, $message, ['parse_mode' => 'HTML']);
+        Log::info('📱 [Telegram] /offers command executed', ['user_id' => $user->id, 'pending' => $pendingOffers->count(), 'accepted' => $acceptedOffers->count()]);
+    }
+    
+    protected function commandSettings(string $chatId, User $user): void
+    {
+        $settings = MessengerSettings::where('user_id', $user->id)->first();
+        
+        $message = "⚙️ <b>Paramètres de Notifications</b>\n\n";
+        
+        if ($settings) {
+            $message .= "<b>Telegram:</b>\n";
+            $message .= "  • Nouvelles offres: " . ($settings->telegram_new_offers ? '✅' : '❌') . "\n";
+            $message .= "  • Messages: " . ($settings->telegram_messages ? '✅' : '❌') . "\n";
+            $message .= "  • Avis: " . ($settings->telegram_reviews ? '✅' : '❌') . "\n";
+            $message .= "  • Tâches: " . ($settings->telegram_tasks ? '✅' : '❌') . "\n\n";
+            
+            $message .= "<b>Email:</b>\n";
+            $message .= "  • Activé: " . ($settings->email_enabled ? '✅' : '❌') . "\n\n";
+            
+            $message .= "<b>Push:</b>\n";
+            $message .= "  • Activé: " . ($settings->push_enabled ? '✅' : '❌') . "\n\n";
+        } else {
+            $message .= "Aucun paramètre configuré.\n\n";
+        }
+        
+        $message .= "🔗 <a href='https://prochepro.fr/profile/notifications'>Modifier les paramètres</a>";
+        
+        $this->sendMessage($chatId, $message, ['parse_mode' => 'HTML']);
+        Log::info('📱 [Telegram] /settings command executed', ['user_id' => $user->id]);
+    }
+    
     protected function commandStart(string $chatId, User $user): void
     {
         $message = "👋 Bienvenue sur ProchePro, {$user->name}!\n\n";
